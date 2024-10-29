@@ -6,7 +6,7 @@ from pretalx.orga.signals import nav_event_settings
 
 @receiver(nav_event_settings)
 def pretalx_salesforce_settings(sender, request, **kwargs):
-    if not request.user.has_perm("orga.change_settings", request.event):
+    if not request.user.has_perm("orga.change_settings", sender):
         return []
     return [
         {

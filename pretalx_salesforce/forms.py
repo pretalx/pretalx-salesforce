@@ -1,10 +1,9 @@
-
-from i18nfield.forms import I18nModelForm
+from django import forms
 
 from .models import SalesforceSettings
 
 
-class SalesforceSettingsForm(I18nModelForm):
+class SalesforceSettingsForm(forms.ModelForm):
 
     def __init__(self, *args, event=None, **kwargs):
         self.instance, _ = SalesforceSettings.objects.get_or_create(event=event)
@@ -12,6 +11,13 @@ class SalesforceSettingsForm(I18nModelForm):
 
     class Meta:
         model = SalesforceSettings
-        fields = ("some_setting", )
-        widgets = {}
-
+        fields = (
+            "client_id",
+            "client_secret",
+            "username",
+            "password",
+            "salesforce_instance",
+        )
+        widgets = {
+            "password": forms.PasswordInput,
+        }

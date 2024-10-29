@@ -12,7 +12,9 @@ maintainers = [
   {name = "Tobias Kunze", email = "r@rixx.de"},
 ]
 
-dependencies = []
+dependencies = [
+    "simple_salesforce",
+]
 
 [project.urls]
 homepage = "https://github.com/pretalx/pretalx-salesforce"
