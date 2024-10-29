@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
@@ -19,3 +21,178 @@ class SalesforceSettings(models.Model):
             "Use https://salesforce.com for real data, or https://test.salesforce.com for sandbox data"
         ),
     )
+
+
+class SpeakerProfileSalesforceSync(models.Model):
+    profile = models.OneToOneField(
+        to="person.SpeakerProfile",
+        on_delete=models.CASCADE,
+        related_name="salesforce_profile_sync",
+    )
+    last_synced = models.DateTimeField(null=True, blank=True)
+    salesforce_id = models.CharField(max_length=255, null=True, blank=True)
+    synced_data = models.JSONField(null=True, blank=True, default=dict)
+
+    @cached_property
+    def split_name(self):
+        result = self.profile.user.name.split(" ", maxsplit=1)
+        if len(result) == 1:
+            return result[0], ""
+        return result
+
+    def serialize(self):
+        return {
+            "pretalx_LegacyID__c": self.profile.user.code,
+            "FirstName": self.split_name[0],
+            "LastName": self.split_name[1],
+            "Email": self.profile.user.email,
+            "Biography__c": self.profile.biography,
+            "Profile_Picture__c": self.user.avatar_url,
+        }
+
+    def data_out_of_date(self):
+        return self.serialize() != self.synced_data
+
+    def should_sync(self):
+        last_modified = max(self.profile.user.updated, self.profile.updated)
+        if (
+            not self.last_synced
+            or not self.salesforce_id
+            or self.last_synced < last_modified
+            or self.data_out_of_date
+        ):
+            return True
+        return False
+
+    def sync(self, sf=None, force=False):
+        if not self.should_sync() and not force:
+            return
+        if not sf:
+            from pretalx_salesforce.sync import get_salesforce_client
+
+            sf = get_salesforce_client(self.profile.event)
+        if not sf:
+            return
+
+        data = self.serialize()
+        if not self.salesforce_id:
+            result = sf.Contact.create(data)
+            self.salesforce_id = result["id"]
+        else:
+            sf.Contact.update(self.salesforce_id, data)
+
+        self.synced_data = data
+        self.last_synced = now()
+        self.save()
+
+
+class SubmissionSalesforceSync(models.Model):
+    """
+    This model handles both the sync of the submission object itself, as well as the
+    sync of the mapping object between a submission and a contact.
+    """
+
+    submission = models.OneToOneField(
+        to="submission.Submission",
+        on_delete=models.CASCADE,
+        related_name="salesforce_sync",
+    )
+    last_synced = models.DateTimeField(null=True, blank=True)
+    salesforce_id = models.CharField(max_length=255, null=True, blank=True)
+    synced_data = models.JSONField(null=True, blank=True, default=dict)
+
+    def serialize(self):
+        return {
+            "CreatedDate": self.submission.created,
+            "pretalx_LegacyID__c": self.submission.code,
+            "Name": self.submission.title,
+            "Track__c": self.submission.track.name,
+            "Status__c": self.submission.state,
+            "Abstract__c": (
+                self.submission.abstract + "\n" + self.submission.description
+            ).strip(),
+            "Pretalx_Record__c": self.submission.urls.public.full,
+        }
+
+    def serialize_relations(self):
+        try:
+            return [
+                {
+                    "Session__c": {"pretalx_LegacyID__c": self.submission.code},
+                    "Contact__c": {"pretalx_LegacyID__c": speaker.code},
+                    "Name": f"{speaker.name} – {self.submission.title}",
+                }
+                for speaker in self.submission.speakers.all()
+            ]
+        except SpeakerProfileSalesforceSync.DoesNotExist:
+            return []
+
+    def data_out_of_date(self):
+        return self.serialize() != self.synced_data.get("submission", {})
+
+    def relations_out_of_date(self):
+        return self.serialize_relations() != self.synced_data.get("relations", [])
+
+    def should_sync(self):
+        if (
+            not self.last_synced
+            or not self.salesforce_id
+            or self.last_synced < self.submission.updated
+            or self.data_out_of_date()
+        ):
+            return True
+        return False
+
+    def should_sync_relations(self):
+        if not self.last_synced or not self.salesforce_id:
+            return False
+        return self.relations_out_of_date()
+
+    def sync(self, sf=None, force=False):
+        if not self.should_sync() and not force:
+            return
+        if not sf:
+            from pretalx_salesforce.sync import get_salesforce_client
+
+            sf = get_salesforce_client(self.submission.event)
+        if not sf:
+            return
+
+        data = self.serialize()
+        if not self.salesforce_id:
+            result = sf.Session__c.create(data)
+            self.salesforce_id = result["id"]
+        else:
+            sf.Session__c.update(self.salesforce_id, data)
+
+        self.synced_data["submission"] = data
+        self.last_synced = now()
+        self.save()
+
+    def sync_relations(self, sf=None, force=False):
+        if not self.should_sync_relations() and not force:
+            return
+        if not sf:
+            from pretalx_salesforce.sync import get_salesforce_client
+
+            sf = get_salesforce_client(self.submission.event)
+        if not sf:
+            return
+
+        data = self.serialize_relations()
+        if not self.synced_data.get("relations"):
+            self.synced_data["relations"] = []
+        if not self.synced_data.get("relation_mapping"):
+            self.synced_data["relation_mapping"] = {}
+
+        for relation in data:
+            if relation["pretalx_LegacyID__c"] in self.synced_data["relation_mapping"]:
+                # This is a known relation, and it holds no data of its own, so we don’t
+                # need to update it
+                continue
+            result = sf.ContactSession__c.create(relation)
+            speaker_id = relation["Contact__c"]["pretalx_LegacyID__c"]
+            self.synced_data["relation_mapping"][speaker_id] = result["id"]
+
+        self.synced_data["relations"] = data
+        self.save()
