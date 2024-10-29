@@ -4,6 +4,13 @@
 {% block extra_title %}SalesForce integration Settings :: {% endblock extra_title %}
 
 {% block content %}
-    <h2>SalesForce integration Settings</h2>
-    {% include "orga/includes/base_form.html" %}
+  <h2>SalesForce integration Settings</h2>
+
+  <div class="alert alert-info"><div>
+    {% blocktranslate trimmed %}
+      Please create an application in SalesForce and provide the following details.
+    {% endblocktranslate %}
+    <a href="https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm" target="_blank">Learn more</a>
+  </div></div>
+  {% include "orga/includes/base_form.html" %}
 {% endblock content %}

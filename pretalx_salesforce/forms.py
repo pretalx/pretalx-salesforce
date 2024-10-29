@@ -7,7 +7,7 @@ class SalesforceSettingsForm(forms.ModelForm):
 
     def __init__(self, *args, event=None, **kwargs):
         self.instance, _ = SalesforceSettings.objects.get_or_create(event=event)
-        super().__init__(*args, **kwargs, instance=self.instance, locales=event.locales)
+        super().__init__(*args, **kwargs, instance=self.instance)
 
     class Meta:
         model = SalesforceSettings
