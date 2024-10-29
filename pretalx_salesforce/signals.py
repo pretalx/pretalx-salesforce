@@ -1,4 +1,3 @@
-
 from django.dispatch import receiver
 from django.urls import reverse
 from pretalx.orga.signals import nav_event_settings
@@ -19,4 +18,3 @@ def pretalx_salesforce_settings(sender, request, **kwargs):
             == "plugins:pretalx_salesforce:settings",
         }
     ]
-

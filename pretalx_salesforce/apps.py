@@ -11,7 +11,9 @@ class PluginApp(AppConfig):
     class PretalxPluginMeta:
         name = gettext_lazy("SalesForce integration")
         author = "Tobias Kunze"
-        description = gettext_lazy("Send speaker and proposal information to SalesForce")
+        description = gettext_lazy(
+            "Send speaker and proposal information to SalesForce"
+        )
         visible = True
         version = __version__
         category = "INTEGRATION"
