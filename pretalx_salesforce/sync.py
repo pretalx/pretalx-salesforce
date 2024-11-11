@@ -53,9 +53,8 @@ def sync_event_with_salesforce(event):
         )
         return
 
-    with scope(event=event):
-        salesforce_full_speaker_sync(sf, event)
-        salesforce_full_submission_sync(sf, event)
+    salesforce_full_speaker_sync(sf, event)
+    salesforce_full_submission_sync(sf, event)
 
 
 def get_salesforce_client(event):
@@ -96,36 +95,38 @@ def get_salesforce_client(event):
 
 
 def salesforce_full_speaker_sync(sf, event):
-    profiles = (
-        SpeakerProfile.objects.filter(event=event)
-        .select_related("user")
-        .prefetch_related("user__submissions")
-        .annotate(
-            event_submission_count=Count(
-                "user__submissions",
-                distinct=True,
-                filter=Q(user__submissions__event=event),
+    with scope(event=event):
+        profiles = (
+            SpeakerProfile.objects.filter(event=event)
+            .select_related("user")
+            .prefetch_related("user__submissions")
+            .annotate(
+                event_submission_count=Count(
+                    "user__submissions",
+                    distinct=True,
+                    filter=Q(user__submissions__event=event),
+                )
             )
+            .filter(event_submission_count__gt=0)
         )
-        .filter(event_submission_count__gt=0)
-    )
 
-    for profile in profiles:
-        try:
-            sync = profile.salesforce_profile_sync
-        except SpeakerProfileSalesforceSync.DoesNotExist:
-            sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
+        for profile in profiles:
+            try:
+                sync = profile.salesforce_profile_sync
+            except SpeakerProfileSalesforceSync.DoesNotExist:
+                sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
 
-        sync.sync()
+            sync.sync()
 
 
 def salesforce_full_submission_sync(sf, event):
-    submissions = event.submissions.all().prefetch_related("speakers")
+    with scope(event=event):
+        submissions = event.submissions.all().prefetch_related("speakers")
 
-    for submission in submissions:
-        try:
-            sync = submission.salesforce_submission_sync
-        except SubmissionSalesforceSync.DoesNotExist:
-            sync = SubmissionSalesforceSync.objects.create(submission=submission)
+        for submission in submissions:
+            try:
+                sync = submission.salesforce_submission_sync
+            except SubmissionSalesforceSync.DoesNotExist:
+                sync = SubmissionSalesforceSync.objects.create(submission=submission)
 
-        sync.sync()
+            sync.sync()
