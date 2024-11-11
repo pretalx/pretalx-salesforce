@@ -22,6 +22,18 @@ class SalesforceSettings(models.Model):
         ),
     )
 
+    @property
+    def sync_ready(self):
+        return all(
+            [
+                self.client_id,
+                self.client_secret,
+                self.username,
+                self.password,
+                self.salesforce_instance,
+            ]
+        )
+
 
 class SpeakerProfileSalesforceSync(models.Model):
     profile = models.OneToOneField(
