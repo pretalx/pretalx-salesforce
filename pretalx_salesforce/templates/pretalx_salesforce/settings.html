@@ -12,5 +12,23 @@
     {% endblocktranslate %}
     <a href="https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm" target="_blank">Learn more</a>
   </div></div>
+
+  <p>
+    <form method="post">
+      {% if last_sync %}
+        {% blocktranslate trimmed with last_sync=last_sync %}
+          Last sync: {{ last_sync }}
+        {% endblocktranslate %}
+      {% else %}
+        {% blocktranslate trimmed %}
+          No sync has been performed yet.
+        {% endblocktranslate %}
+      {% endif %}
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-sm d-inline-block" name="sync-now">Sync now</button>
+    </form>
+  </p>
+
   {% include "orga/includes/base_form.html" %}
+
 {% endblock content %}
