@@ -1,8 +1,28 @@
 SalesForce integration
 ==========================
 
-This is a plugin for `pretalx`_.
-Send speaker and proposal information to SalesForce
+This is a plugin for `pretalx`_ that serves to send speaker and proposal information to SalesForce.
+
+Information is sent every eight hours or on manual sync, and is mapped as follows:
+
+- Users and their speaker profiles are sent as contacts:
+    - Contact.pretalx_LegacyID__c is set to the pretalx user ID
+    - Contact.FirstName is set to the first part of a user’s name, separated by whitespace.
+    - Contact.LastName is set to any remaining part of a user’s name.
+    - Contact.Email is set to the user’s email address.
+    - Contact.Biography__c is set to the user’s biography.
+    - Contact.Profile_Picture__c is set to the user’s profile picture URL.
+- Submission objects are set synced to the custom Session object:
+    - CreatedDate is set to the submission’s creation date.
+    - pretalx_LegacyID__c is set to the submission’s pretalx ID.
+    - Name is set to the submission’s title.
+    - Track__c is set to the submission’s track (by name, not by ID).
+    - Status__c is set to the submission’s status.
+    - Abstract__c is set to the submission’s abstract plus the submission’s description, separated by two newlines and then stripped of whitespace.
+    - Pretalx_Record__c is set to the submission’s public URL.
+- The mapping between Contacts and Sessions is synced to the custom ContactSession object:
+    - Contact__c is set to the Salesforce Contact.
+    - Session__c is set to the Salesforce Session.
 
 Development setup
 -----------------
