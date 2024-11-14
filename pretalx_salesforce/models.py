@@ -116,15 +116,17 @@ class SubmissionSalesforceSync(models.Model):
 
     def serialize(self):
         return {
-            "CreatedDate": self.submission.created,
+            "CreatedDate": self.submission.created.isoformat(),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": self.submission.title,
-            "Track__c": self.submission.track.name,
+            "Track__c": str(self.submission.track.name),
             "Status__c": self.submission.state,
             "Abstract__c": (
-                self.submission.abstract + "\n" + self.submission.description
+                (self.submission.abstract or "")
+                + "\n"
+                + (self.submission.description or "")
             ).strip(),
-            "Pretalx_Record__c": self.submission.urls.public.full,
+            "Pretalx_Record__c": self.submission.urls.public.full(),
         }
 
     def serialize_relations(self):
@@ -144,6 +146,7 @@ class SubmissionSalesforceSync(models.Model):
     def data_out_of_date(self):
         return self.serialize() != self.synced_data.get("submission", {})
 
+    @property
     def relations_out_of_date(self):
         return self.serialize_relations() != self.synced_data.get("relations", [])
 
@@ -152,7 +155,7 @@ class SubmissionSalesforceSync(models.Model):
             not self.last_synced
             or not self.salesforce_id
             or self.last_synced < self.submission.updated
-            or self.data_out_of_date()
+            or self.data_out_of_date
         ):
             return True
         return False
@@ -160,7 +163,7 @@ class SubmissionSalesforceSync(models.Model):
     def should_sync_relations(self):
         if not self.last_synced or not self.salesforce_id:
             return False
-        return self.relations_out_of_date()
+        return self.relations_out_of_date
 
     def sync(self, sf=None, force=False):
         if not self.should_sync() and not force:
