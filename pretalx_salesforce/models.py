@@ -60,6 +60,7 @@ class SpeakerProfileSalesforceSync(models.Model):
             "Email": self.profile.user.email,
             "Biography__c": self.profile.biography,
             "pretalx_Profile_Picture__c": self.profile.user.avatar_url,
+            "RecordTypeID": "0124x000000A5QuAAK",
         }
 
     @property
