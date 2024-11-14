@@ -59,9 +59,10 @@ class SpeakerProfileSalesforceSync(models.Model):
             "LastName": self.split_name[1],
             "Email": self.profile.user.email,
             "Biography__c": self.profile.biography,
-            "Profile_Picture__c": self.user.avatar_url,
+            "Profile_Picture__c": self.profile.user.avatar_url,
         }
 
+    @property
     def data_out_of_date(self):
         return self.serialize() != self.synced_data
 
@@ -139,6 +140,7 @@ class SubmissionSalesforceSync(models.Model):
         except SpeakerProfileSalesforceSync.DoesNotExist:
             return []
 
+    @property
     def data_out_of_date(self):
         return self.serialize() != self.synced_data.get("submission", {})
 
