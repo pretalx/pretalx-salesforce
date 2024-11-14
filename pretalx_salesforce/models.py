@@ -66,7 +66,7 @@ class SpeakerProfileSalesforceSync(models.Model):
         return self.serialize() != self.synced_data
 
     def should_sync(self):
-        last_modified = max(self.profile.user.updated, self.profile.updated)
+        last_modified = self.profile.updated
         if (
             not self.last_synced
             or not self.salesforce_id
