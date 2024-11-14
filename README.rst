@@ -11,7 +11,7 @@ Information is sent every eight hours or on manual sync, and is mapped as follow
     - Contact.LastName is set to any remaining part of a user’s name.
     - Contact.Email is set to the user’s email address.
     - Contact.Biography__c is set to the user’s biography.
-    - Contact.Profile_Picture__c is set to the user’s profile picture URL.
+    - Contact.pretalx_Profile_Picture__c is set to the user’s profile picture URL.
 - Submission objects are set synced to the custom Session object:
     - CreatedDate is set to the submission’s creation date.
     - pretalx_LegacyID__c is set to the submission’s pretalx ID.

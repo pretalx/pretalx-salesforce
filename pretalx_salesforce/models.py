@@ -59,7 +59,7 @@ class SpeakerProfileSalesforceSync(models.Model):
             "LastName": self.split_name[1],
             "Email": self.profile.user.email,
             "Biography__c": self.profile.biography,
-            "Profile_Picture__c": self.profile.user.avatar_url,
+            "pretalx_Profile_Picture__c": self.profile.user.avatar_url,
         }
 
     @property
