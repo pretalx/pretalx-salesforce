@@ -116,7 +116,7 @@ def salesforce_full_speaker_sync(sf, event):
             except SpeakerProfileSalesforceSync.DoesNotExist:
                 sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
 
-            sync.sync()
+            sync.sync(sf=sf)
 
 
 def salesforce_full_submission_sync(sf, event):
@@ -129,4 +129,4 @@ def salesforce_full_submission_sync(sf, event):
             except SubmissionSalesforceSync.DoesNotExist:
                 sync = SubmissionSalesforceSync.objects.create(submission=submission)
 
-            sync.sync()
+            sync.sync(sf=sf)
