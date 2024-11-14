@@ -49,7 +49,7 @@ class SpeakerProfileSalesforceSync(models.Model):
     def split_name(self):
         result = self.profile.user.name.split(" ", maxsplit=1)
         if len(result) == 1:
-            return result[0], ""
+            return "", result[0]
         return result
 
     def serialize(self):
