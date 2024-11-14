@@ -4,6 +4,12 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
+def ellipsis(string, length=80):
+    if len(string) > length:
+        return string[: length - 1] + "…"
+    return string
+
+
 class SalesforceSettings(models.Model):
     event = models.OneToOneField(
         to="event.Event",
@@ -119,7 +125,7 @@ class SubmissionSalesforceSync(models.Model):
         return {
             "CreatedDate": self.submission.created.isoformat(),
             "pretalx_LegacyID__c": self.submission.code,
-            "Name": self.submission.title,
+            "Name": ellipsis(self.submission.title, 80),
             "Track__c": str(self.submission.track.name),
             "Status__c": self.submission.state.capitalize(),
             "Abstract__c": (
