@@ -111,11 +111,9 @@ def salesforce_full_speaker_sync(sf, event):
         )
 
         for profile in profiles:
-            try:
-                sync = profile.salesforce_profile_sync
-            except SpeakerProfileSalesforceSync.DoesNotExist:
-                sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
-
+            sync, _ = SpeakerProfileSalesforceSync.objects.get_or_create(
+                profile=profile
+            )
             sync.sync(sf=sf)
 
 
@@ -124,9 +122,7 @@ def salesforce_full_submission_sync(sf, event):
         submissions = event.submissions.all().prefetch_related("speakers")
 
         for submission in submissions:
-            try:
-                sync = submission.salesforce_submission_sync
-            except SubmissionSalesforceSync.DoesNotExist:
-                sync = SubmissionSalesforceSync.objects.create(submission=submission)
-
+            sync, _ = SubmissionSalesforceSync.objects.get_or_create(
+                submission=submission
+            )
             sync.sync(sf=sf)
