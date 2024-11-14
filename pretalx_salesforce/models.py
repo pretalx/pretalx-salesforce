@@ -121,7 +121,7 @@ class SubmissionSalesforceSync(models.Model):
             "pretalx_LegacyID__c": self.submission.code,
             "Name": self.submission.title,
             "Track__c": str(self.submission.track.name),
-            "Status__c": self.submission.state,
+            "Status__c": self.submission.state.capitalize(),
             "Abstract__c": (
                 (self.submission.abstract or "")
                 + "\n"
