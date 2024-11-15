@@ -121,13 +121,19 @@ class SubmissionSalesforceSync(models.Model):
     salesforce_id = models.CharField(max_length=255, null=True, blank=True)
     synced_data = models.JSONField(null=True, blank=True, default=dict)
 
+    @property
+    def serialized_state(self):
+        if self.submission.state in ("submitted", "accepted", "rejected", "confirmed"):
+            return self.submission.state.capitalize()
+        return "Rejected"
+
     def serialize(self):
         return {
             # "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": ellipsis(self.submission.title, 80),
             "Track__c": str(self.submission.track.name),
-            "Status__c": self.submission.state.capitalize(),
+            "Status__c": self.serialized_state,
             "Abstract__c": (
                 (self.submission.abstract or "")
                 + "\n"
