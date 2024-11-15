@@ -111,9 +111,10 @@ def salesforce_full_speaker_sync(sf, event):
         )
 
         for profile in profiles:
-            sync, _ = SpeakerProfileSalesforceSync.objects.get_or_create(
-                profile=profile
-            )
+            try:
+                sync = profile.salesforce_profile_sync
+            except SpeakerProfileSalesforceSync.DoesNotExist:
+                sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
             try:
                 sync.sync(sf=sf)
             except Exception as e:
@@ -121,15 +122,18 @@ def salesforce_full_speaker_sync(sf, event):
                     f"Failed to sync speaker profile {profile.code} for event {event.slug}: {e}"
                 )
 
+            sync.sync(sf=sf)
+
 
 def salesforce_full_submission_sync(sf, event):
     with scope(event=event):
         submissions = event.submissions.all().prefetch_related("speakers")
 
         for submission in submissions:
-            sync, _ = SubmissionSalesforceSync.objects.get_or_create(
-                submission=submission
-            )
+            try:
+                sync = submission.salesforce_submission_sync
+            except SubmissionSalesforceSync.DoesNotExist:
+                sync = SubmissionSalesforceSync.objects.create(submission=submission)
             try:
                 sync.sync(sf=sf)
                 sync.sync_relations(sf=sf)
@@ -137,3 +141,5 @@ def salesforce_full_submission_sync(sf, event):
                 logger.error(
                     f"Failed to sync submission {submission.code} for event {event.slug}: {e}"
                 )
+
+            sync.sync(sf=sf)
