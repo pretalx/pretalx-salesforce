@@ -132,6 +132,7 @@ def salesforce_full_submission_sync(sf, event):
             )
             try:
                 sync.sync(sf=sf)
+                sync.sync_relations(sf=sf)
             except Exception as e:
                 logger.error(
                     f"Failed to sync submission {submission.code} for event {event.slug}: {e}"
