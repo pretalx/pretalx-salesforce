@@ -223,7 +223,7 @@ class SubmissionSalesforceSync(models.Model):
                 # This is a known relation, and it holds no data of its own, so we don’t
                 # need to update it
                 continue
-            result = sf.ContactSession__c.create(relation)
+            result = sf.Contact_Session.create(relation)
             speaker_id = relation["Contact__c"]["pretalx_LegacyID__c"]
             self.synced_data["relation_mapping"][speaker_id] = result["id"]
 

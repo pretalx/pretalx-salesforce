@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def sync_event_with_salesforce(event):
     """
     Syncs an event with Salesforce. The sync maps objects as follows, and requires
-    the custom ContactSession and Session objects to be created in Salesforce:
+    the custom Contact_Session and Session objects to be created in Salesforce:
 
     - User/SpeakerProfile -> Contact, setting
         - Contact.pretalx_LegacyID__c = User.code
@@ -29,7 +29,7 @@ def sync_event_with_salesforce(event):
         - Contact.Biography__c = User.event_profile.biography
         - Contact.Profile_Picture__c = User.avatar.url
 
-    - [nothing] -> ContactSession
+    - [nothing] -> Contact_Session
         - ID
         - Session__c = Session
         - Contact__c = Contact
