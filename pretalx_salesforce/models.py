@@ -149,6 +149,7 @@ class SubmissionSalesforceSync(models.Model):
                     "Session__c": {"pretalx_LegacyID__c": self.submission.code},
                     "Contact__c": {"pretalx_LegacyID__c": speaker.code},
                     "Name": f"{speaker.name} – {self.submission.title}",
+                    "pretalx_LegacyID__c": f"{speaker.code}-{self.submission.code}",
                 }
                 for speaker in self.submission.speakers.all()
             ]
