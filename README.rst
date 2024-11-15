@@ -20,7 +20,7 @@ Information is sent every eight hours or on manual sync, and is mapped as follow
     - Status__c is set to the submission’s status.
     - Abstract__c is set to the submission’s abstract plus the submission’s description, separated by two newlines and then stripped of whitespace.
     - Pretalx_Record__c is set to the submission’s public URL.
-- The mapping between Contacts and Sessions is synced to the custom Contact_Session object:
+- The mapping between Contacts and Sessions is synced to the custom Contact_Session__c object:
     - Contact__c is set to the Salesforce Contact.
     - Session__c is set to the Salesforce Session.
 
