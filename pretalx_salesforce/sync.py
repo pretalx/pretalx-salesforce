@@ -131,7 +131,7 @@ def salesforce_full_submission_sync(sf, event):
 
         for submission in submissions:
             try:
-                sync = submission.salesforce_submission_sync
+                sync = submission.salesforce_sync
             except SubmissionSalesforceSync.DoesNotExist:
                 sync = SubmissionSalesforceSync.objects.create(submission=submission)
             try:
