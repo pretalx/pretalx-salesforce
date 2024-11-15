@@ -132,7 +132,9 @@ class SubmissionSalesforceSync(models.Model):
             # "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": ellipsis(self.submission.title, 80),
-            "Track__c": str(self.submission.track.name),
+            "Track__c": (
+                str(self.submission.track.name) if self.submission.track else ""
+            ),
             "Status__c": self.serialized_state,
             "Abstract__c": (
                 (self.submission.abstract or "")
