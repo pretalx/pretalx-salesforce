@@ -152,7 +152,7 @@ class SubmissionSalesforceSync(models.Model):
                     "Contact__c": speaker.event_profile(
                         self.submission.event
                     ).salesforce_profile_sync.salesforce_id,
-                    "Name": f"{speaker.name} – {self.submission.title}",
+                    "Name": ellipsis(f"{speaker.name} – {self.submission.title}"),
                     "pretalx_LegacyID__c": f"{speaker.code}-{self.submission.code}",
                 }
                 for speaker in self.submission.speakers.all()
@@ -226,7 +226,7 @@ class SubmissionSalesforceSync(models.Model):
                 # need to update it
                 continue
             result = sf.Contact_Session__c.create(relation)
-            speaker_id = relation["Contact__c"]["pretalx_LegacyID__c"]
+            speaker_id = relation["Contact__c"]
             self.synced_data["relation_mapping"][speaker_id] = result["id"]
             self.synced_data["relations"].append(relation)
 
