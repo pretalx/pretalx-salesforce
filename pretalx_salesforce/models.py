@@ -166,7 +166,12 @@ class SubmissionSalesforceSync(models.Model):
 
     @property
     def relations_out_of_date(self):
-        return self.serialize_relations() != self.synced_data.get("relations", [])
+        # We compare our generated IDs as a shorthand – the rest of the data is
+        # static by definition, and otherwise we’d have to deduplicate a list of
+        # (unhashable) dictionaries
+        return {d["pretalx_LegacyID__c"] for d in self.serialize_relations()} == {
+            d["pretalx_LegacyID__c"] for d in self.synced_data["relations"]
+        }
 
     def should_sync(self):
         if (
