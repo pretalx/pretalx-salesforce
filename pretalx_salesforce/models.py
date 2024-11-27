@@ -169,7 +169,7 @@ class SubmissionSalesforceSync(models.Model):
         # We compare our generated IDs as a shorthand – the rest of the data is
         # static by definition, and otherwise we’d have to deduplicate a list of
         # (unhashable) dictionaries
-        return {d["pretalx_LegacyID__c"] for d in self.serialize_relations()} == {
+        return {d["pretalx_LegacyID__c"] for d in self.serialize_relations()} != {
             d["pretalx_LegacyID__c"] for d in self.synced_data["relations"]
         }
 
