@@ -123,13 +123,11 @@ class SubmissionSalesforceSync(models.Model):
 
     @property
     def serialized_state(self):
-        if self.submission.state in ("submitted", "accepted", "rejected", "confirmed"):
-            return self.submission.state.capitalize()
-        return "Rejected"
+        return self.submission.state.capitalize()
 
     def serialize(self):
         return {
-            # "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": ellipsis(self.submission.title, 80),
             "Track__c": (
