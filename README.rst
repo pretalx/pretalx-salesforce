@@ -18,6 +18,7 @@ Information is sent every eight hours or on manual sync, and is mapped as follow
     - Name is set to the submission’s title.
     - Session__Title__c is the submission’s full title, as Name is truncated to 80 characters.
     - Track__c is set to the submission’s track (by name, not by ID).
+    - Submission_Format__c is set to the submission’s type (by name, not by ID).
     - Status__c is set to the submission’s status.
     - Abstract__c is set to the submission’s abstract plus the submission’s description, separated by two newlines and then stripped of whitespace.
     - Pretalx_Record__c is set to the submission’s public URL.
