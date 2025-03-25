@@ -14,7 +14,7 @@
   </div></div>
 
   <p>
-    <form method="post">
+    <form method="post" action="{% url "plugins:pretalx_salesforce:sync" event=request.event.slug %}">
       {% if last_sync %}
         {% blocktranslate trimmed with last_sync=last_sync %}
           Last sync: {{ last_sync }}
@@ -25,7 +25,7 @@
         {% endblocktranslate %}
       {% endif %}
       {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-sm d-inline-block" name="sync-now">Sync now</button>
+      <button type="submit" class="btn btn-primary btn-sm d-inline-block">Sync now</button>
     </form>
   </p>
 

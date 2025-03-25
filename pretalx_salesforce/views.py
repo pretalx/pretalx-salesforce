@@ -1,6 +1,7 @@
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import FormView, View
 from django_context_decorator import context
 from pretalx.common.views.mixins import PermissionRequired
 
@@ -40,21 +41,6 @@ class SalesforceSettingsView(PermissionRequired, FormView):
             return last_speaker_sync
         return max(last_speaker_sync, last_submission_sync)
 
-    def post(self, request, *args, **kwargs):
-        if "sync-now" not in request.POST:
-            return super().post(request, *args, **kwargs)
-
-        try:
-            salesforce_event_sync.apply_async(kwargs={"event_id": request.event.pk})
-            messages.success(self.request, _("The event was synced with SalesForce."))
-        except Exception as e:
-            messages.error(
-                self.request,
-                _("An error occurred while syncing the event with SalesForce.")
-                + f" {e}",
-            )
-        return self.get(request, *args, **kwargs)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["event"] = self.request.event
@@ -66,3 +52,19 @@ class SalesforceSettingsView(PermissionRequired, FormView):
             self.request, _("The SalesForce integration settings were updated.")
         )
         return super().form_valid(form)
+
+
+class SalesforceSyncView(PermissionRequired, View):
+    permission_required = "orga.change_settings"
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            salesforce_event_sync.apply_async(kwargs={"event_id": request.event.pk})
+            messages.success(self.request, _("The SalesForce sync was started."))
+        except Exception as e:
+            messages.error(
+                self.request,
+                _("An error occurred while syncing the event with SalesForce.")
+                + f" {e}",
+            )
+        return redirect("plugins:pretalx_salesforce:settings")
