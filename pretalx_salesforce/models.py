@@ -134,7 +134,7 @@ class SubmissionSalesforceSync(models.Model):
             "Track__c": (
                 str(self.submission.track.name) if self.submission.track else ""
             ),
-            "Session_Format__c": str(self.submission_type),
+            "Session_Format__c": str(self.submission.submission_type),
             "Status__c": self.serialized_state,
             "Abstract__c": (
                 (self.submission.abstract or "")
