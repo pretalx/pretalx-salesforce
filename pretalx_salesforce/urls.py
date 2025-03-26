@@ -10,7 +10,7 @@ urlpatterns = [
         name="settings",
     ),
     re_path(
-        rf"^orga/event/(?P<event>{SLUG_REGEX})/settings/p/pretalx_salesforce/$",
+        rf"^orga/event/(?P<event>{SLUG_REGEX})/settings/p/pretalx_salesforce/sync$",
         SalesforceSyncView.as_view(),
         name="sync",
     ),
