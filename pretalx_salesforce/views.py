@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, View
 from django_context_decorator import context
@@ -67,4 +68,9 @@ class SalesforceSyncView(PermissionRequired, View):
                 _("An error occurred while syncing the event with SalesForce.")
                 + f" {e}",
             )
-        return redirect("plugins:pretalx_salesforce:settings")
+        return redirect(
+            reverse(
+                "plugins:pretalx_salesforce:settings",
+                kwargs={"event": request.event.slug},
+            )
+        )
