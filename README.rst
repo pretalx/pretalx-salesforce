@@ -16,7 +16,7 @@ Information is sent every eight hours or on manual sync, and is mapped as follow
     - CreatedDate is set to the submission’s creation date.
     - pretalx_LegacyID__c is set to the submission’s pretalx ID.
     - Name is set to the submission’s title.
-    - Session__Title__c is the submission’s full title, as Name is truncated to 80 characters.
+    - Session_Title__c is the submission’s full title, as Name is truncated to 80 characters.
     - Track__c is set to the submission’s track (by name, not by ID).
     - Submission_Format__c is set to the submission’s type (by name, not by ID).
     - Status__c is set to the submission’s status.
