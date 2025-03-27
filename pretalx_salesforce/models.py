@@ -170,7 +170,7 @@ class SubmissionSalesforceSync(models.Model):
         # static by definition, and otherwise we’d have to deduplicate a list of
         # (unhashable) dictionaries
         return {d["pretalx_LegacyID__c"] for d in self.serialize_relations()} != {
-            d["pretalx_LegacyID__c"] for d in self.synced_data["relations"]
+            d["pretalx_LegacyID__c"] for d in (self.synced_data.get("relations") or {})
         }
 
     def should_sync(self):
