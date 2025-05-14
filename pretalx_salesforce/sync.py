@@ -122,8 +122,6 @@ def salesforce_full_speaker_sync(sf, event):
                     f"Failed to sync speaker profile {profile.code} for event {event.slug}: {e}"
                 )
 
-            sync.sync(sf=sf)
-
 
 def salesforce_full_submission_sync(sf, event):
     with scope(event=event):
@@ -141,5 +139,3 @@ def salesforce_full_submission_sync(sf, event):
                 logger.error(
                     f"Failed to sync submission {submission.code} for event {event.slug}: {e}"
                 )
-
-            sync.sync(sf=sf)
