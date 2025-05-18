@@ -12,7 +12,7 @@ from .tasks import salesforce_event_sync
 
 
 class SalesforceSettingsView(PermissionRequired, FormView):
-    permission_required = "orga.change_settings"
+    permission_required = "event.update_event"
     template_name = "pretalx_salesforce/settings.html"
     form_class = SalesforceSettingsForm
 
@@ -56,7 +56,7 @@ class SalesforceSettingsView(PermissionRequired, FormView):
 
 
 class SalesforceSyncView(PermissionRequired, View):
-    permission_required = "orga.change_settings"
+    permission_required = "event.update_event"
 
     def dispatch(self, request, *args, **kwargs):
         try:
