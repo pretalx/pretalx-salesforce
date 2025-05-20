@@ -53,8 +53,9 @@ def sync_event_with_salesforce(event):
         )
         return
 
-    salesforce_full_speaker_sync(sf, event)
-    salesforce_full_submission_sync(sf, event)
+    queryset = get_default_submission_queryset()
+    salesforce_full_speaker_sync(sf, event, submissions=queryset)
+    salesforce_full_submission_sync(sf, event, submissions=queryset)
 
 
 def get_salesforce_client(event):
@@ -94,8 +95,13 @@ def get_salesforce_client(event):
     return Salesforce(instance_url=instance_url, session_id=access_token)
 
 
-def salesforce_full_speaker_sync(sf, event):
+def get_default_submission_queryset(event):
+    return event.submissions.all()
+
+
+def salesforce_full_speaker_sync(sf, event, submissions=None):
     with scope(event=event):
+        submissions = submissions or get_default_submission_queryset(event)
         profiles = (
             SpeakerProfile.objects.filter(event=event)
             .select_related("user")
@@ -104,7 +110,7 @@ def salesforce_full_speaker_sync(sf, event):
                 event_submission_count=Count(
                     "user__submissions",
                     distinct=True,
-                    filter=Q(user__submissions__event=event),
+                    filter=Q(user__submissions__in=submissions),
                 )
             )
             .filter(event_submission_count__gt=0)
@@ -123,9 +129,10 @@ def salesforce_full_speaker_sync(sf, event):
                 )
 
 
-def salesforce_full_submission_sync(sf, event):
+def salesforce_full_submission_sync(sf, event, submissions=None):
     with scope(event=event):
-        submissions = event.submissions.all().prefetch_related("speakers")
+        submissions = submissions or get_default_submission_queryset()
+        submissions = submissions.prefetch_related("speakers")
 
         for submission in submissions:
             try:
