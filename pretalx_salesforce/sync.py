@@ -53,7 +53,7 @@ def sync_event_with_salesforce(event):
         )
         return
 
-    queryset = get_default_submission_queryset()
+    queryset = get_default_submission_queryset(event)
     salesforce_full_speaker_sync(sf, event, submissions=queryset)
     salesforce_full_submission_sync(sf, event, submissions=queryset)
 
@@ -131,7 +131,7 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
 
 def salesforce_full_submission_sync(sf, event, submissions=None):
     with scope(event=event):
-        submissions = submissions or get_default_submission_queryset()
+        submissions = submissions or get_default_submission_queryset(event)
         submissions = submissions.prefetch_related("speakers")
 
         for submission in submissions:
