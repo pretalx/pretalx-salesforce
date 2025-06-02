@@ -127,7 +127,7 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
                     sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
                 except IntegrityError:
                     logger.error(
-                        f"Failed to sync speaker profile {profile.code} for event {event.slug}: {e}"
+                        f"Failed to sync speaker profile {profile.code} for event {event.slug}."
                     )
                     continue
             try:
