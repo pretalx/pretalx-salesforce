@@ -2,6 +2,7 @@ import logging
 from contextlib import suppress
 
 import requests
+from django.db import IntegrityError
 from django.db.models import Count, Q
 from django_scopes import scope
 from pretalx.person.models import SpeakerProfile
@@ -115,13 +116,20 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
                 )
             )
             .filter(event_submission_count__gt=0)
+            .distinct()
         )
 
         for profile in profiles:
             try:
-                sync = profile.salesforce_profile_sync
+                sync = SpeakerProfileSalesforceSync.objects.get(profile=profile)
             except SpeakerProfileSalesforceSync.DoesNotExist:
-                sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
+                try:
+                    sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
+                except IntegrityError:
+                    logger.error(
+                        f"Failed to sync speaker profile {profile.code} for event {event.slug}: {e}"
+                    )
+                    continue
             try:
                 sync.sync(sf=sf)
             except Exception as e:
