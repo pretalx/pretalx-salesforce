@@ -53,9 +53,10 @@ def sync_event_with_salesforce(event):
         )
         return
 
-    queryset = get_default_submission_queryset(event)
-    salesforce_full_speaker_sync(sf, event, submissions=queryset)
-    salesforce_full_submission_sync(sf, event, submissions=queryset)
+    with scope(event=event):
+        queryset = get_default_submission_queryset(event)
+        salesforce_full_speaker_sync(sf, event, submissions=queryset)
+        salesforce_full_submission_sync(sf, event, submissions=queryset)
 
 
 def get_salesforce_client(event):
