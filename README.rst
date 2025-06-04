@@ -13,7 +13,6 @@ Information is sent every eight hours or on manual sync, and is mapped as follow
     - Contact.Biography__c is set to the user’s biography.
     - Contact.pretalx_Profile_Picture__c is set to the user’s profile picture URL.
 - Submission objects are set synced to the custom Session object:
-    - CreatedDate is set to the submission’s creation date.
     - pretalx_LegacyID__c is set to the submission’s pretalx ID.
     - Name is set to the submission’s title.
     - Session_Title__c is the submission’s full title, as Name is truncated to 80 characters.

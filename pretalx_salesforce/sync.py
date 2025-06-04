@@ -37,7 +37,6 @@ def sync_event_with_salesforce(event):
 
     - Submission -> Session
         - ID
-        - CreatedDate = Submission.created
         - pretalx_LegacyID__c = Submission.code
         - Name = Submission.title
         - Track__c = Submission.track.name

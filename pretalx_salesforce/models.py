@@ -127,7 +127,7 @@ class SubmissionSalesforceSync(models.Model):
 
     def serialize(self):
         return {
-            "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            # "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": ellipsis(self.submission.title, 80),
             "Session_Title__c": self.submission.title,
