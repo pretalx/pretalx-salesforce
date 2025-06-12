@@ -44,6 +44,7 @@ def sync_event_with_salesforce(event):
         - Abstract__c = Submission.abstract + Submission.description
         - Pretalx_Record__c = Submission.urls.public.full
     """
+    sf = None
     with suppress(Exception):
         sf = get_salesforce_client(event)
 
