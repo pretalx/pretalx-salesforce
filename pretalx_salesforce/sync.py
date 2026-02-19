@@ -5,14 +5,12 @@ import requests
 from django.db import IntegrityError
 from django.db.models import Count, Q
 from django_scopes import scope
-from pretalx.person.models import SpeakerProfile
+from pretalx_salesforce.models import (SalesforceSettings,
+                                       SpeakerProfileSalesforceSync,
+                                       SubmissionSalesforceSync)
 from simple_salesforce import Salesforce
 
-from pretalx_salesforce.models import (
-    SalesforceSettings,
-    SpeakerProfileSalesforceSync,
-    SubmissionSalesforceSync,
-)
+from pretalx.person.models import SpeakerProfile
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +25,7 @@ def sync_event_with_salesforce(event):
         - Contact.FirstName = User.name.split(" ", maxsplit=1)[0]
         - Contact.LastName = User.name.split(" ", maxsplit=1)[1] (or empty)
         - Contact.Email = User.email
-        - Contact.Biography__c = User.event_profile.biography
+        - Contact.Biography__c = SpeakerProfile.biography
         - Contact.Profile_Picture__c = User.avatar.url
 
     - [nothing] -> Contact_Session__c
@@ -107,12 +105,12 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
         profiles = (
             SpeakerProfile.objects.filter(event=event)
             .select_related("user")
-            .prefetch_related("user__submissions")
+            .prefetch_related("submissions")
             .annotate(
                 event_submission_count=Count(
-                    "user__submissions",
+                    "submissions",
                     distinct=True,
-                    filter=Q(user__submissions__in=submissions),
+                    filter=Q(submissions__in=submissions),
                 )
             )
             .filter(event_submission_count__gt=0)

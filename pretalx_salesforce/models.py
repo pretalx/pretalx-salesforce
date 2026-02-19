@@ -149,11 +149,9 @@ class SubmissionSalesforceSync(models.Model):
             return [
                 {
                     "Session__c": self.salesforce_id,
-                    "Contact__c": speaker.event_profile(
-                        self.submission.event
-                    ).salesforce_profile_sync.salesforce_id,
-                    "Name": ellipsis(f"{speaker.name} – {self.submission.title}"),
-                    "pretalx_LegacyID__c": f"{speaker.code}-{self.submission.code}",
+                    "Contact__c": speaker.salesforce_profile_sync.salesforce_id,
+                    "Name": ellipsis(f"{speaker.get_display_name()} – {self.submission.title}"),
+                    "pretalx_LegacyID__c": f"{speaker.user.code}-{self.submission.code}",
                 }
                 for speaker in self.submission.speakers.all()
             ]

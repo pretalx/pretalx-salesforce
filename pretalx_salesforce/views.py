@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, View
 from django_context_decorator import context
+
 from pretalx.common.views.mixins import PermissionRequired
 
 from .forms import SalesforceSettingsForm

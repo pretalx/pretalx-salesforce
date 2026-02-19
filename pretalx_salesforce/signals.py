@@ -1,5 +1,6 @@
 from django.dispatch import receiver
 from django.urls import reverse
+
 from pretalx.common.signals import minimum_interval, periodic_task
 from pretalx.orga.signals import nav_event_settings
 
