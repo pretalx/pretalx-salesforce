@@ -25,8 +25,8 @@ def pretalx_salesforce_settings(sender, request, **kwargs):
 @receiver(periodic_task)
 @minimum_interval(minutes_after_success=60 * 8)
 def periodic_salesforce_sync(sender, **kwargs):
-    from .models import SalesforceSettings
-    from .tasks import salesforce_event_sync
+    from .models import SalesforceSettings  # noqa: PLC0415
+    from .tasks import salesforce_event_sync  # noqa: PLC0415
 
     for settings in SalesforceSettings.objects.all().filter(
         event__plugins__contains="pretalx_salesforce"

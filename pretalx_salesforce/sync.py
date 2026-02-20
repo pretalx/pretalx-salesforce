@@ -5,9 +5,11 @@ import requests
 from django.db import IntegrityError
 from django.db.models import Count, Q
 from django_scopes import scope
-from pretalx_salesforce.models import (SalesforceSettings,
-                                       SpeakerProfileSalesforceSync,
-                                       SubmissionSalesforceSync)
+from pretalx_salesforce.models import (
+    SalesforceSettings,
+    SpeakerProfileSalesforceSync,
+    SubmissionSalesforceSync,
+)
 from simple_salesforce import Salesforce
 
 from pretalx.person.models import SpeakerProfile
@@ -16,9 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def sync_event_with_salesforce(event):
-    """
-    Syncs an event with Salesforce. The sync maps objects as follows, and requires
-    the custom Contact_Session__c and Session objects to be created in Salesforce:
+    """Syncs an event with Salesforce.
+
+    The sync maps objects as follows, and requires the custom Contact_Session__c
+    and Session objects to be created in Salesforce:
 
     - User/SpeakerProfile -> Contact, setting
         - Contact.pretalx_LegacyID__c = User.code
@@ -48,7 +51,8 @@ def sync_event_with_salesforce(event):
 
     if not sf:
         logger.error(
-            f"Failed to get Salesforce client for event {event.slug}, aborting sync"
+            "Failed to get Salesforce client for event %s, aborting sync",
+            event.slug,
         )
         return
 
@@ -62,7 +66,7 @@ def get_salesforce_client(event):
     try:
         salesforce_settings = event.pretalx_salesforce_settings
     except SalesforceSettings.DoesNotExist:
-        logger.error(f"Salesforce settings for event {event.slug} do not exist.")
+        logger.error("Salesforce settings for event %s do not exist.", event.slug)
         return
 
     if (
@@ -71,7 +75,7 @@ def get_salesforce_client(event):
         or not salesforce_settings.username
         or not salesforce_settings.password
     ):
-        logger.error(f"Salesforce settings for event {event.slug} are incomplete.")
+        logger.error("Salesforce settings for event %s are incomplete.", event.slug)
         return
 
     url = salesforce_settings.salesforce_instance or "https://salesforce.com"
@@ -85,7 +89,7 @@ def get_salesforce_client(event):
     }
     response = requests.post(auth_url, data=payload)
     if response.status_code != 200:
-        logger.error(f"Failed to authenticate with Salesforce: {response.text}")
+        logger.error("Failed to authenticate with Salesforce: %s", response.text)
         return
 
     response = response.json()
@@ -125,14 +129,19 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
                     sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
                 except IntegrityError:
                     logger.error(
-                        f"Failed to sync speaker profile {profile.code} for event {event.slug}."
+                        "Failed to sync speaker profile %s for event %s.",
+                        profile.code,
+                        event.slug,
                     )
                     continue
             try:
                 sync.sync(sf=sf)
             except Exception as e:
                 logger.error(
-                    f"Failed to sync speaker profile {profile.code} for event {event.slug}: {e}"
+                    "Failed to sync speaker profile %s for event %s: %s",
+                    profile.code,
+                    event.slug,
+                    e,
                 )
 
 
@@ -151,5 +160,8 @@ def salesforce_full_submission_sync(sf, event, submissions=None):
                 sync.sync_relations(sf=sf)
             except Exception as e:
                 logger.error(
-                    f"Failed to sync submission {submission.code} for event {event.slug}: {e}"
+                    "Failed to sync submission %s for event %s: %s",
+                    submission.code,
+                    event.slug,
+                    e,
                 )

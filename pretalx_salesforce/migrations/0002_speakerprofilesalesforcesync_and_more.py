@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("person", "0029_alter_user_avatar_thumbnail_and_more"),
         ("pretalx_salesforce", "0001_initial"),

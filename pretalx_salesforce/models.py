@@ -75,20 +75,18 @@ class SpeakerProfileSalesforceSync(models.Model):
 
     def should_sync(self):
         last_modified = self.profile.updated
-        if (
+        return (
             not self.last_synced
             or not self.salesforce_id
             or self.last_synced < last_modified
             or self.data_out_of_date
-        ):
-            return True
-        return False
+        )
 
     def sync(self, sf=None, force=False):
         if not self.should_sync() and not force:
             return
         if not sf:
-            from pretalx_salesforce.sync import get_salesforce_client
+            from pretalx_salesforce.sync import get_salesforce_client  # noqa: PLC0415
 
             sf = get_salesforce_client(self.profile.event)
         if not sf:
@@ -127,7 +125,6 @@ class SubmissionSalesforceSync(models.Model):
 
     def serialize(self):
         return {
-            # "CreatedDate": self.submission.created.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "pretalx_LegacyID__c": self.submission.code,
             "Name": ellipsis(self.submission.title, 80),
             "Session_Title__c": self.submission.title,
@@ -150,7 +147,9 @@ class SubmissionSalesforceSync(models.Model):
                 {
                     "Session__c": self.salesforce_id,
                     "Contact__c": speaker.salesforce_profile_sync.salesforce_id,
-                    "Name": ellipsis(f"{speaker.get_display_name()} – {self.submission.title}"),
+                    "Name": ellipsis(
+                        f"{speaker.get_display_name()} – {self.submission.title}"
+                    ),
                     "pretalx_LegacyID__c": f"{speaker.user.code}-{self.submission.code}",
                 }
                 for speaker in self.submission.speakers.all()
@@ -172,14 +171,12 @@ class SubmissionSalesforceSync(models.Model):
         }
 
     def should_sync(self):
-        if (
+        return (
             not self.last_synced
             or not self.salesforce_id
             or self.last_synced < self.submission.updated
             or self.data_out_of_date
-        ):
-            return True
-        return False
+        )
 
     def should_sync_relations(self):
         if not self.last_synced or not self.salesforce_id:
@@ -190,7 +187,7 @@ class SubmissionSalesforceSync(models.Model):
         if not self.should_sync() and not force:
             return
         if not sf:
-            from pretalx_salesforce.sync import get_salesforce_client
+            from pretalx_salesforce.sync import get_salesforce_client  # noqa: PLC0415
 
             sf = get_salesforce_client(self.submission.event)
         if not sf:
@@ -211,7 +208,7 @@ class SubmissionSalesforceSync(models.Model):
         if not self.should_sync_relations() and not force:
             return
         if not sf:
-            from pretalx_salesforce.sync import get_salesforce_client
+            from pretalx_salesforce.sync import get_salesforce_client  # noqa: PLC0415
 
             sf = get_salesforce_client(self.submission.event)
         if not sf:
