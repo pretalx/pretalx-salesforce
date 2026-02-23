@@ -17,6 +17,4 @@ class SalesforceSettingsForm(forms.ModelForm):
             "password",
             "salesforce_instance",
         )
-        widgets = {
-            "password": forms.PasswordInput,
-        }
+        widgets = {"password": forms.PasswordInput}

@@ -5,14 +5,15 @@ import requests
 from django.db import IntegrityError
 from django.db.models import Count, Q
 from django_scopes import scope
+from simple_salesforce import Salesforce
+
+from pretalx.person.models import SpeakerProfile
+
 from pretalx_salesforce.models import (
     SalesforceSettings,
     SpeakerProfileSalesforceSync,
     SubmissionSalesforceSync,
 )
-from simple_salesforce import Salesforce
-
-from pretalx.person.models import SpeakerProfile
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,7 @@ def sync_event_with_salesforce(event):
 
     if not sf:
         logger.error(
-            "Failed to get Salesforce client for event %s, aborting sync",
-            event.slug,
+            "Failed to get Salesforce client for event %s, aborting sync", event.slug
         )
         return
 
@@ -66,7 +66,7 @@ def get_salesforce_client(event):
     try:
         salesforce_settings = event.pretalx_salesforce_settings
     except SalesforceSettings.DoesNotExist:
-        logger.error("Salesforce settings for event %s do not exist.", event.slug)
+        logger.warning("Salesforce settings for event %s do not exist.", event.slug)
         return
 
     if (
@@ -87,7 +87,7 @@ def get_salesforce_client(event):
         "username": salesforce_settings.username,
         "password": salesforce_settings.password,
     }
-    response = requests.post(auth_url, data=payload)
+    response = requests.post(auth_url, data=payload, timeout=30)
     if response.status_code != 200:
         logger.error("Failed to authenticate with Salesforce: %s", response.text)
         return
@@ -112,9 +112,7 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
             .prefetch_related("submissions")
             .annotate(
                 event_submission_count=Count(
-                    "submissions",
-                    distinct=True,
-                    filter=Q(submissions__in=submissions),
+                    "submissions", distinct=True, filter=Q(submissions__in=submissions)
                 )
             )
             .filter(event_submission_count__gt=0)
@@ -128,7 +126,7 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
                 try:
                     sync = SpeakerProfileSalesforceSync.objects.create(profile=profile)
                 except IntegrityError:
-                    logger.error(
+                    logger.warning(
                         "Failed to sync speaker profile %s for event %s.",
                         profile.code,
                         event.slug,
@@ -136,12 +134,11 @@ def salesforce_full_speaker_sync(sf, event, submissions=None):
                     continue
             try:
                 sync.sync(sf=sf)
-            except Exception as e:
-                logger.error(
-                    "Failed to sync speaker profile %s for event %s: %s",
+            except Exception:  # noqa: BLE001
+                logger.exception(
+                    "Failed to sync speaker profile %s for event %s",
                     profile.code,
                     event.slug,
-                    e,
                 )
 
 
@@ -158,10 +155,9 @@ def salesforce_full_submission_sync(sf, event, submissions=None):
             try:
                 sync.sync(sf=sf)
                 sync.sync_relations(sf=sf)
-            except Exception as e:
-                logger.error(
-                    "Failed to sync submission %s for event %s: %s",
+            except Exception:  # noqa: BLE001
+                logger.exception(
+                    "Failed to sync submission %s for event %s",
                     submission.code,
                     event.slug,
-                    e,
                 )

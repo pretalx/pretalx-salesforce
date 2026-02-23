@@ -63,7 +63,7 @@ class SalesforceSyncView(PermissionRequired, View):
         try:
             salesforce_event_sync.apply_async(kwargs={"event_id": request.event.pk})
             messages.success(self.request, _("The SalesForce sync was started."))
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             messages.error(
                 self.request,
                 _("An error occurred while syncing the event with SalesForce.")

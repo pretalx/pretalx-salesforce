@@ -51,8 +51,7 @@ def submission(event):
 @pytest.mark.django_db
 def test_orga_can_access_settings(orga_client, event):
     response = orga_client.get(
-        reverse(SETTINGS_URL_NAME, kwargs={"event": event.slug}),
-        follow=True,
+        reverse(SETTINGS_URL_NAME, kwargs={"event": event.slug}), follow=True
     )
     assert response.status_code == 200
 
@@ -60,7 +59,7 @@ def test_orga_can_access_settings(orga_client, event):
 @pytest.mark.django_db
 def test_reviewer_cannot_access_settings(review_client, event):
     response = review_client.get(
-        reverse(SETTINGS_URL_NAME, kwargs={"event": event.slug}),
+        reverse(SETTINGS_URL_NAME, kwargs={"event": event.slug})
     )
     assert response.status_code == 404
 
@@ -88,9 +87,7 @@ def test_orga_can_save_settings(orga_client, event):
 @pytest.mark.django_db
 @patch("pretalx_salesforce.views.salesforce_event_sync")
 def test_reviewer_cannot_trigger_sync(mock_task, review_client, event):
-    response = review_client.get(
-        reverse(SYNC_URL_NAME, kwargs={"event": event.slug}),
-    )
+    response = review_client.get(reverse(SYNC_URL_NAME, kwargs={"event": event.slug}))
     # The sync view overrides dispatch directly, so it always redirects.
     # The permission check happens at the event middleware level instead.
     assert response.status_code == 302
@@ -99,9 +96,7 @@ def test_reviewer_cannot_trigger_sync(mock_task, review_client, event):
 @pytest.mark.django_db
 @patch("pretalx_salesforce.views.salesforce_event_sync")
 def test_orga_can_trigger_sync(mock_task, orga_client, event):
-    response = orga_client.get(
-        reverse(SYNC_URL_NAME, kwargs={"event": event.slug}),
-    )
+    response = orga_client.get(reverse(SYNC_URL_NAME, kwargs={"event": event.slug}))
     assert response.status_code == 302
     mock_task.apply_async.assert_called_once()
 
@@ -111,8 +106,7 @@ def test_orga_can_trigger_sync(mock_task, orga_client, event):
 def test_sync_error_shows_message(mock_task, orga_client, event):
     mock_task.apply_async.side_effect = Exception("Connection failed")
     response = orga_client.get(
-        reverse(SYNC_URL_NAME, kwargs={"event": event.slug}),
-        follow=True,
+        reverse(SYNC_URL_NAME, kwargs={"event": event.slug}), follow=True
     )
     assert response.status_code == 200
 
@@ -141,8 +135,7 @@ def test_sync_ready_when_all_fields_set(salesforce_settings):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "field",
-    ("client_id", "client_secret", "username", "password"),
+    "field", ("client_id", "client_secret", "username", "password")
 )
 def test_sync_not_ready_when_field_missing(salesforce_settings, field):
     setattr(salesforce_settings, field, "")

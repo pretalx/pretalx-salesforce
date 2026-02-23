@@ -28,6 +28,9 @@ class SalesforceSettings(models.Model):
         ),
     )
 
+    def __str__(self):
+        return f"Salesforce settings for {self.event}"
+
     @property
     def sync_ready(self):
         return all(
@@ -50,6 +53,9 @@ class SpeakerProfileSalesforceSync(models.Model):
     last_synced = models.DateTimeField(null=True, blank=True)
     salesforce_id = models.CharField(max_length=255, null=True, blank=True)
     synced_data = models.JSONField(null=True, blank=True, default=dict)
+
+    def __str__(self):
+        return f"Salesforce sync for {self.profile}"
 
     @cached_property
     def split_name(self):
@@ -118,6 +124,9 @@ class SubmissionSalesforceSync(models.Model):
     last_synced = models.DateTimeField(null=True, blank=True)
     salesforce_id = models.CharField(max_length=255, null=True, blank=True)
     synced_data = models.JSONField(null=True, blank=True, default=dict)
+
+    def __str__(self):
+        return f"Salesforce sync for {self.submission}"
 
     @property
     def serialized_state(self):
