@@ -1,7 +1,8 @@
 import logging
 from contextlib import suppress
+from urllib.parse import urlencode
 
-import requests
+import urllib3
 from django.db import IntegrityError
 from django.db.models import Count, Q
 from django_scopes import scope
@@ -87,9 +88,20 @@ def get_salesforce_client(event):
         "username": salesforce_settings.username,
         "password": salesforce_settings.password,
     }
-    response = requests.post(auth_url, data=payload, timeout=30)
-    if response.status_code != 200:
-        logger.error("Failed to authenticate with Salesforce: %s", response.text)
+    # Salesforce's OAuth endpoint expects application/x-www-form-urlencoded;
+    # urllib3's ``fields=`` uses multipart/form-data, so encode manually.
+    response = urllib3.request(
+        "POST",
+        auth_url,
+        body=urlencode(payload),
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        timeout=30,
+    )
+    if response.status != 200:
+        logger.error(
+            "Failed to authenticate with Salesforce: %s",
+            response.data.decode("utf-8", errors="replace"),
+        )
         return
 
     response = response.json()
