@@ -2,17 +2,17 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/pretalx/pretalx-salesforce/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|------------------------------------ | -------: | -------: | -------: | -------: | ------: | --------: |
-| pretalx\_salesforce/\_\_init\_\_.py |        1 |        0 |        0 |        0 |    100% |           |
-| pretalx\_salesforce/apps.py         |       15 |        0 |        0 |        0 |    100% |           |
-| pretalx\_salesforce/forms.py        |       10 |        0 |        0 |        0 |    100% |           |
-| pretalx\_salesforce/models.py       |      114 |       15 |       30 |       10 |     83% |64, 80, 93, 97, 99, 166-167, 171, 197, 201, 203, 218, 222, 224, 227-\>229, 229-\>232, 236 |
-| pretalx\_salesforce/signals.py      |       15 |        0 |        6 |        1 |     95% |   34-\>31 |
-| pretalx\_salesforce/sync.py         |       70 |       22 |       10 |        0 |     68% |66-99, 128-134 |
-| pretalx\_salesforce/tasks.py        |        5 |        2 |        0 |        0 |     60% |     10-11 |
-| pretalx\_salesforce/views.py        |       44 |        5 |        6 |        1 |     80% |     40-44 |
-| **TOTAL**                           |  **274** |   **44** |   **52** |   **12** | **80%** |           |
+| Name                                |    Stmts |     Miss |   Branch |   BrPart |    Cover |   Missing |
+|------------------------------------ | -------: | -------: | -------: | -------: | -------: | --------: |
+| pretalx\_salesforce/\_\_init\_\_.py |        1 |        0 |        0 |        0 |     100% |           |
+| pretalx\_salesforce/apps.py         |       15 |        0 |        0 |        0 |     100% |           |
+| pretalx\_salesforce/forms.py        |       10 |        0 |        0 |        0 |     100% |           |
+| pretalx\_salesforce/models.py       |      114 |        0 |       30 |        0 |     100% |           |
+| pretalx\_salesforce/signals.py      |       15 |        0 |        6 |        0 |     100% |           |
+| pretalx\_salesforce/sync.py         |       71 |        0 |       10 |        0 |     100% |           |
+| pretalx\_salesforce/tasks.py        |        5 |        0 |        0 |        0 |     100% |           |
+| pretalx\_salesforce/views.py        |       44 |        0 |        6 |        0 |     100% |           |
+| **TOTAL**                           |  **275** |    **0** |   **52** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
