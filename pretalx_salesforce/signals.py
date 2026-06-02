@@ -28,7 +28,7 @@ def periodic_salesforce_sync(sender, **kwargs):
     from .models import SalesforceSettings  # noqa: PLC0415
     from .tasks import salesforce_event_sync  # noqa: PLC0415
 
-    for settings in SalesforceSettings.objects.all().filter(
+    for settings in SalesforceSettings.objects.filter(
         event__plugins__contains="pretalx_salesforce"
     ):
         if settings.sync_ready:
