@@ -14,7 +14,7 @@
   </div></div>
 
   <p>
-    <form method="post" action="{% url "plugins:pretalx_salesforce:sync" event=request.event.slug %}">
+    <form method="post" action="{% url 'plugins:pretalx_salesforce:sync' event=request.event.slug %}">
       {% if last_sync %}
         {% blocktranslate trimmed with last_sync=last_sync %}
           Last sync: {{ last_sync }}
