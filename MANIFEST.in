@@ -4,3 +4,4 @@ exclude pretalx_salesforce/locale/django.pot
 recursive-include pretalx_salesforce/locale *
 recursive-include pretalx_salesforce *.py
 include justfile
+include uv.lock
